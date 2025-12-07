@@ -66,4 +66,13 @@ class TopCategoryGrouper(BaseEstimator, TransformerMixin):
     X_new[self.column + '_grouped'] = X_new[self.column].apply(lambda x: x if x in self.top_categories else 'Other')
     return X_new
 
-4. 
+4. class TextLengthExtractor(BaseEstimator, TransformerMixin):
+    def __init__(self, column):
+        self.column = column
+
+    def fit(self, X, y= None):
+        return self
+    def transform(self, X):
+        X_new  = X.copy()
+        X_new[self.column + '_length'] = X_new[self.column].apply(lambda x: len(str(x)) if x is not None else 0)
+        return X_new
