@@ -38,3 +38,32 @@ class TinyScaler(BaseEstimator, TransformerMixin):
 scaler = TinyScaler(column = 'age')
 scaler.fit(X_train)
 X_train = scaler.transform(X_train)
+
+2. class AddConstant(BaseEstimator, TransformerMixin):
+        def __init__(self, column, constant = 2):
+              self.column = column
+              self.constant = constant
+        def fit(self, X, y = None):
+              return self
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + '_added'] = X_new[self.column] + self.constant
+            return X_new
+
+3. TopCategoryGrouper
+class TopCategoryGrouper(BaseEstimator, TransformerMixin):
+  def __init__(self, column, top_n = 5):
+      self.top_n = top_n
+      self.top_categories = None
+      self.column = column
+
+  def fit(self, X, y = None):
+    self.top_categories = X[self.column].value_counts().nlargest(self.top_n).index.tolist()
+    return self
+
+  def transform(self, X):
+    X_new =  X.copy()
+    X_new[self.column + '_grouped'] = X_new[self.column].apply(lambda x: x if x in self.top_categories else 'Other')
+    return X_new
+
+4. 
