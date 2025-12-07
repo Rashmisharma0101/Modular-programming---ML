@@ -1,0 +1,12 @@
+1. Crux of writing a class (like WaveBinner or CountryGrouper)
+
+A class in Python essentially packages data + behavior. In ML preprocessing, a class usually represents a transformer that you might fit and then transform data.
+Rule of thumb for self.something
+Anything you want to store across method calls → self.something.
+Example: in a binner, the thresholds for bins, or in a CountryGrouper, the mapping dictionary.
+Anything temporary for a single call → local variable inside the method.
+
+Key points:
+__init__ → define parameters the user sets. Nothing data-dependent should go here.
+fit → calculate data-dependent things (like bin edges, group mappings, scaling factors) and store them in self.
+transform → use the stored self attributes to actually modify the data.
