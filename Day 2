@@ -191,7 +191,8 @@ class GroupMeanEncoder(BaseEstimator, TransformerMixin):
             self.column = column
 
         def fit(self, X, y = None):
-            self.category_target_mean = X.groupby([self.column])[self.y].mean()
+            temp = pd.DataFrame({self.column : X[self.column], "Target": y})
+            self.category_target_mean = X.groupby(self.column).["target"].mean()
             return self
 
         def transform(self, X):
@@ -215,7 +216,7 @@ class RatioFeatureCreator(BaseEstimator, TransformerMixin):
 
         def transform(self, X):
             X_new = X.copy()
-            X_new[self.column1 + "_" + self.column2]  = X_new[self.column1] / X_new[self.column2]
+            X_new[self.column1 + "_" + self.column2]  = X_new[self.column1] / X_new[self.column2].replace(0, np.nan)
             return X_new
 
 10. DateFeatureExtractor
@@ -235,10 +236,10 @@ class DateFeatureExtractor(BaseEstimator, TransformerMixin):
 
         def transform(self, X):
             X_new = X.copy()
-            X_new['year'] = X_new[column].dt.year
-            X_new['month'] = X_new[column].dt.month
-            X_new['day'] = X_new[column].dt.day
-            X_new['weekday'] = X_new[column].dt.weekday
+            X_new['year'] = X_new[self.column].dt.year
+            X_new['month'] = X_new[self.column].dt.month
+            X_new['day'] = X_new[self.column].dt.day
+            X_new['weekday'] = X_new[self.column].dt.weekday
             return X_new
 
             
