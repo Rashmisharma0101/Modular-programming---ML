@@ -1,0 +1,17 @@
+1. MissingCategoryImputer
+If a column is categorical, replace missing values with the most frequent category.
+
+class MissingCategoryImputer(BaseEstimator, TransformerMixin):
+    def __init__(self, column, topn = 1):
+      self.most_freq  = None
+      self.column =  column
+      self.topn = topn     
+
+    def fit(self, X, y= None):
+        self.most_freq = X[self.column].value_counts().nlargest(self.topn).index[0]
+        return self
+
+    def transform(self, X):
+        X_new = X.copy()
+        X_new[self.column] = X_new[self.column].fillna(self.most_freq)
+        return X_new
