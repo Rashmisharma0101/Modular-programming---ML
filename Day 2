@@ -15,3 +15,67 @@ class MissingCategoryImputer(BaseEstimator, TransformerMixin):
         X_new = X.copy()
         X_new[self.column] = X_new[self.column].fillna(self.most_freq)
         return X_new
+
+2. RareCategoryGrouper
+class RareCategoryGrouper(BaseEstimator, TransformerMixin):
+        def __init__(self, column, threshold = 200):
+            self.threshold = threshold
+            self.column  = column
+
+        def fit(self, X, y= None):
+            value_counts   = X[self.column].value_counts()
+            self.rarelist = value_counts[value_counts < self.threshold].index.tolist()
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + "grouped"] = X_new[self.column].apply(lambda x: "other" if x in self.rarelist else x)
+            return X_new
+
+3. OutlierClipper
+import numpy as np
+class OutlierClipper(BaseEstimator, TransformerMixin):
+    def __init__(self, column):
+        self.mean = None
+        self.column = column
+        self.lower = None
+        self.upper = None
+
+    def fit(self, X, y = None):
+        self.lower = np.percentile(X[self.column], 0.01)
+        self.upper = np.percentile(X[self.column], 0.99)
+        return self
+
+    def transform(self, X):
+        X_new = X.copy()
+
+        def f1(x):
+            if x < self.lower:
+               return self.lower
+            elif x> self.upper:
+               return self.upper
+            else:
+               return x
+
+
+        X_new[self.column + "_clipped"] = X_new[self.column].apply(f1)
+        return X_new
+
+alternate way 
+def transform(self, X):
+        X_new = X.copy()
+        X_new[self.column + "_clipped"] = X_new[self.column].apply(
+            lambda x: 
+                self.lower if x < self.lower else 
+                self.upper if x > self.upper else 
+                x
+        )
+        return X_new
+
+easiest way
+
+X_new[self.column + "_clipped"] = X_new[self.column].clip(self.lower, self.upper)
+
+
+
+            
