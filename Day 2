@@ -76,6 +76,6 @@ easiest way
 
 X_new[self.column + "_clipped"] = X_new[self.column].clip(self.lower, self.upper)
 
-
+4. ZScoreStandardizer
 
             
