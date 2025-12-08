@@ -76,3 +76,25 @@ class TopCategoryGrouper(BaseEstimator, TransformerMixin):
         X_new  = X.copy()
         X_new[self.column + '_length'] = X_new[self.column].apply(lambda x: len(str(x)) if x is not None else 0)
         return X_new
+
+
+5. Flag high values
+
+class FlagHighValues(BaseEstimator, TransformerMixin):
+  def __init__(self, column):
+    self.column = column
+    self.mean = None
+
+  def fit(self, X, y = None):
+    self.mean = X[self.column].mean()
+    return self
+
+  def transform(self, X):
+    X_new = X.copy()
+    X_new[self.column  + "_Is_high"] = X_new[self.column].apply(lambda x: 1 if pd.notnull(x) and x > self.mean else 0) 
+    return X_new
+
+pd.notnull(x) works for both:
+NaN
+None
+Prevents comparing strings with numbers
