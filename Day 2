@@ -146,4 +146,100 @@ class BooleanFlagFromWords(BaseEstimator, TransformerMixin):
             return X_new
             
 
+6. BinaryBinner
+For numeric column, create bins:
+values < threshold → 0
+values >= threshold → 1
+Requirement: threshold computed as median during fit.
+
+class BinaryBinner(BaseEstimator, TransformerMixin):
+        def __init__(self, column):
+            self.column = column
+
+        def fit(self, X, y = None):
+            self.threshold = X[self.column].median()
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + "_binned"] = X_new[self.column].apply(lambda x : 0 if x < self.threshold else 1)
+            return X_new
+
+7. ZeroToMissingConverter
+Convert all 0 values in a numeric column to NaN.
+
+class ZeroToMissingConverter(BaseEstimator, TransformerMixin):
+        def __init__(self, column):
+            self.column = column
+
+        def fit(self, X, y = None):
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + '_new'] = X_new[self.column].replace(0, np.nan)
+            return X_new
+
+8 GroupMeanEncoder
+For a categorical column, compute the mean of target y for each category.
+Requirements:
+In fit(): compute category → mean mapping.
+In transform(): map categories to their mean
+
+class GroupMeanEncoder(BaseEstimator, TransformerMixin):
+        def __init__(self, column):
+            self.column = column
+
+        def fit(self, X, y = None):
+            self.category_target_mean = X.groupby([self.column])[self.y].mean()
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + '_mapped']  = X_new[self.column].map(self.category_target_mean)
+            return X_new
+
+⚠ Good interviewer question!
+
+9️⃣ RatioFeatureCreator
+Given two numeric columns col1 and col2, create a new col = col1 / col2.
+Must handle division-by-zero safely.
+
+class RatioFeatureCreator(BaseEstimator, TransformerMixin):
+        def __init__(self, column1, column2):
+            self.column1 = column1
+            self.column2 = column2
+
+        def fit(self, X, y = None):
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column1 + "_" + self.column2]  = X_new[self.column1] / X_new[self.column2]
+            return X_new
+
+10. DateFeatureExtractor
+Given a datetime column, extract:
+year
+month
+day
+weekday
+
+import datetime
+class DateFeatureExtractor(BaseEstimator, TransformerMixin):
+        def __init__(self, column):
+            self.column = column
+
+        def fit(self, X, y = None):
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new['year'] = X_new[column].dt.year
+            X_new['month'] = X_new[column].dt.month
+            X_new['day'] = X_new[column].dt.day
+            X_new['weekday'] = X_new[column].dt.weekday
+            return X_new
+
+            
             
