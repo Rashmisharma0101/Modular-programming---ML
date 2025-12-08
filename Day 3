@@ -1,0 +1,17 @@
+1. LogTransformer (safe log)
+class LogTransformer (BaseEstimator, TransformerMixin):
+    def __init__(self, column):
+        self.column = column
+
+    def fit(self, X, y = None):
+        return self
+
+    def transform(self, X):
+        X_new = X.copy()
+        X_new[self.column+ '_logged'] = X_new[self.column].apply(lambda x: 0 if x < 0 else x)
+        X_new[self.column + '_logged'] = X_new[self.column].apply(lambda x: log(x+1))
+        return X_new
+
+2. 
+        
+        
