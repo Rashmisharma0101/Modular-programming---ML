@@ -77,5 +77,73 @@ easiest way
 X_new[self.column + "_clipped"] = X_new[self.column].clip(self.lower, self.upper)
 
 4. ZScoreStandardizer
+class ZScoreStandardizer(BaseEstimator, transformerMixin):
+        def __init__(self, column):
+            self.column = column
+
+        def fit(self, X, y = None):
+            self.mean = X[self.column].mean()
+            self.std = X[self.column].std()
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + "_standardized"] = (X_new[self.column] - self.mean)/self.std
+            return X_new
+            
+    Leaarning
+
+You do not need to initialize self.mean = None or self.std = None in __init__() because Python does NOT require "variable declarations" like C, C++, or Java.
+
+In Python:
+
+Attributes can be created anytime, not only inside __init__.
+
+The attribute becomes part of the object the moment you assign it.
+
+🧠 The Real Rule You Need to Understand
+✔ You ONLY put in __init__() things that:
+
+are hyperparameters
+
+are given by the user
+
+are not dependent on data
+
+Examples:
+
+column
+
+top_n
+
+threshold
+
+impute_value
+
+These belong in __init__().
+
+❌ You should NOT put in __init__() things like:
+
+mean
+std
+most_frequent_category
+lower_limit
+upper_limit
+
+5. BooleanFlagFromWords
+
+class BooleanFlagFromWords(BaseEstimator, TransformerMixin):
+        def __init__(self, column, keywords = ['free', 'discount']):
+            self.column = column
+            self.keywords = keywords
+
+        def fit(self, X, y = None):
+            return self
+
+        def transform(self, X):
+            X_new = X.copy()
+            X_new[self.column + "_flagged"] = X_new[self.column].apply(lambda x : 1 if x in self.keywords else 0)
+            return X_new
+            
 
             
