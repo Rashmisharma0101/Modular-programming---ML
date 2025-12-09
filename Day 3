@@ -143,23 +143,25 @@ class MultiValueSplitter(BaseEstimator, TransformerMixin):
                 X_new[self.column + '_flagged'] = X[self.column].apply(lambda x : 1 if x == self.keyword else 0)
                 return X_new
                 
-                
-
-
-
-
-
-
-
-
-8️⃣ PercentileRankEncoder
-
+8. PercentileRankEncoder
 For numeric column:
-
 Convert each value to percentile rank between 0–1.
 Use scipy.stats.rankdata or implement manually.
 
-9️⃣ RollingWindowMean (advanced)
+class PercentileRankEncoder(BaseEstimator, TransformerMixin):
+         def __init__(self, column, keyword = 'banana'):
+                self.column = column
+                self.keyword = keyword
+
+         def fit(self, X, y = None):
+                return self
+
+         def transform(self, X):
+                X_new[self.column +'_percentile'] = np.percentile(X_new[self.column])
+                X_new[self.column +'_percentile_rank'] = (X_new[self.column +'_percentile']*10).round(2)
+                return X_new
+
+9 RollingWindowMean (advanced)
 
 Given a numeric column:
 
