@@ -12,6 +12,173 @@ class LogTransformer (BaseEstimator, TransformerMixin):
         X_new[self.column + '_logged'] = X_new[self.column].apply(lambda x: log(x+1))
         return X_new
 
-2. 
+2. class CategoryFrequencyEncoder(BaseEstimator, TransformerMixin):
+         def __init__(self, column):
+                self.column = column
+
+        def fit(self, X, y = None):
+                vc = X[self.column].value_counts(normalize = True)
+                self.frequency = vc.to_dict()
+                return self
+
+         def transform(self, X):
+                X_new[self.column + '_freq'] = X_new[self.column].map(self.frequency)
+                X_new[self.column + '_freq'] = X_new[self.column + '_freq'].fillna(0)
+                return X_new
+                X_new = X.copy()
         
-        
+3. QuantileClipper
+For numeric column:
+clip values below 5th percentile to 5th percentile
+Clip values above 95th percentile to 95th percentile
+Compute quantiles in fit().
+
+class   QuantileClipper(BaseEstimator, TransformerMixin):
+         def __init__(self, column):
+                self.column = column
+
+         def fit(self, X, y = None):
+                fifth = np.percentile(X[self.column], 0.05)
+                ninetyfifth = np.percentile(X[self.column], 0.95)
+                return self
+
+         def transform(self, X):
+                X_new = X.copy()
+                X_new[self.column +'_clipped'] = np.clip(X_new[self.column], fifth, ninetyfifth)
+                return X_new
+                
+
+4. MultiColumnImputer
+Given a list of columns:
+Numeric → replace NaN with median
+Categorical → replace NaN with mode
+Dynamic logic based on dtype.
+
+class MultiColumnImputer(BaseEstimator, TransformerMixin):
+         def __init__(self, columns):
+                self.columns = columns
+                self.median = {}
+                self.modes = {}
+
+         def fit(self, X, y = None):
+                for col in self.columns:
+                    if is_numeric_dtype(X[col]):
+                        self.medians[col] = X[col].median()
+                    else:
+                        self.modes = X[self.col].mode().iloc[0]
+                return self
+
+         def transform(self, X):
+                X_new = X.copy()
+                for col in self.columns:
+                if col in self.medians:
+                    X_new[self.column + '_imputed'] = X_new[self.column].fillna(self.medians[col])
+                else:
+                    X_new[self.column + '_imputed'] = X_new[self.column].fillna(self.modes[col])
+                
+                return X_new
+
+5️⃣ ConditionalFlagger
+Create a new column:
+flag = 1 if (col1 > mean(col1)) AND (col2 < median(col2)) else 0
+You must compute mean and median in fit().
+
+class ConditionalFlagger(BaseEstimator, TransformerMixin):
+         def __init__(self, columns1, column2):
+                self.column1 = column1
+                self.column2 = column2
+         def fit(self, X, y = None):
+                self.mean = X[self.column1].mean()
+                self.median  = X[self.column2].median()
+                return self
+         def transform(self, X):
+                X_new = X.copy()
+                X_new[self.column + '_flagged'] = X_new[self.column].apply(lambda x: 1 if x  > self.mean and x < self.median else 0)
+                return X_new
+
+
+6. InteractionFeatureCreator
+Given two columns col1, col2, create:
+col1 * col2
+col1 + col2
+col1 - col2
+col1 / (col2 or NaN)
+Safe division required.
+
+class InteractionFeatureCreator(BaseEstimator, TransformerMixin):
+         def __init__(self, columns1, column2):
+                self.column1 = column1
+                self.column2 = column2
+         def fit(self, X, y = None):
+                return self
+         def transform(self, X);
+                X_new = X.copy()
+                X_new[self.column + '_multiply'] = X_new[self.column1] * X_new[self.column2]
+                X_new[self.column + '_add'] = X_new[self.column1] + X_new[self.column2]
+                X_new[self.column + '_subtract'] = X_new[self.column1] - X_new[self.column2]
+                X_new[self.column + '_divide'] = X_new[self.column1] / X_new[self.column2].fillna(0).replace(0, 1)
+                return X_new
+
+
+7 MultiValueSplitter
+Column contains strings like:
+"apple, mango, banana"
+Create:
+word count
+first item
+boolean column: keyword present ("banana")
+
+class MultiValueSplitter(BaseEstimator, TransformerMixin):
+         def __init__(self, column, keyword = 'banana'):
+                self.column = column
+                self.keyword = keyword
+
+         def fit(self, X, y = None):
+                return self
+         
+        def transform(self, X):
+                X_new = X.copy()
+                X_new[self.column + '_wordcount'] = len(X[self.column].split(","))
+                X_new[self.column + '_firstitem'] = X[self.column].split(",")[0]
+                X_new[self.column + '_flagged'] = X[self.column].apply(lambda x : 1 if x == self.keyword else 0)
+                return X_new
+                
+                
+
+
+
+
+
+
+
+
+8️⃣ PercentileRankEncoder
+
+For numeric column:
+
+Convert each value to percentile rank between 0–1.
+Use scipy.stats.rankdata or implement manually.
+
+9️⃣ RollingWindowMean (advanced)
+
+Given a numeric column:
+
+value → mean of last 3 values
+
+
+But:
+
+Must work on dataframe row-by-row
+
+Should NOT use .rolling() inside transform
+(rolling must be computed in fit, not transform)
+
+💡 This tests: stateful transforms.
+
+🔟 TargetMedianEncoder (Category → median of y)
+
+Like mean encoder, but instead compute median of y for each category.
+
+Also:
+
+Unseen categories in transform → assign global median of y.        
