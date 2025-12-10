@@ -9,7 +9,7 @@ class LogTransformer (BaseEstimator, TransformerMixin):
     def transform(self, X):
         X_new = X.copy()
         X_new[self.column+ '_logged'] = X_new[self.column].apply(lambda x: 0 if x < 0 else x)
-        X_new[self.column + '_logged'] = X_new[self.column].apply(lambda x: log(x+1))
+        X_new[self.column + '_logged'] = X_new[self.column + '_logged'].apply(lambda x: np.log1p(x))
         return X_new
 
 2. class CategoryFrequencyEncoder(BaseEstimator, TransformerMixin):
@@ -162,25 +162,24 @@ class PercentileRankEncoder(BaseEstimator, TransformerMixin):
                 return X_new
 
 9 RollingWindowMean (advanced)
-
 Given a numeric column:
-
 value → mean of last 3 values
-
-
 But:
-
 Must work on dataframe row-by-row
-
 Should NOT use .rolling() inside transform
 (rolling must be computed in fit, not transform)
-
 💡 This tests: stateful transforms.
 
 🔟 TargetMedianEncoder (Category → median of y)
-
 Like mean encoder, but instead compute median of y for each category.
+Also:Unseen categories in transform → assign global median of y.    
 
-Also:
-
-Unseen categories in transform → assign global median of y.        
+class TargetMedianEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self, ):
+        pass
+    def fit(self, X, y = None):
+        median_counts = X.groupby(self.column)[target].median()
+        return self
+    def transform(Self, X):
+        X_new = X.copy()
+        X_new[self.column + '_median_encoded'] = X_new[self.column].map(median_counts)
