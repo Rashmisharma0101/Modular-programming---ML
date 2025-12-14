@@ -1,0 +1,77 @@
+Goal: Build a pipeline using modular classes to process taxi trip data.
+Instructions:
+Stage 1 — Data Loader
+Class: TaxiDataLoader
+Method: load_data() → returns a list of dictionaries or pandas DataFrame
+Input: CSV or manually create a small dataset
+Stage 2 — Data Cleaner
+Class: TaxiDataCleaner
+Method: clean_data(data) → remove trips with fare_amount <= 0 or passenger_count <= 0
+Stage 3 — Feature Engineer
+Class: TaxiFeatureEngineer
+Method: add_features(data) → add a column fare_per_passenger = fare_amount / passenger_count
+Stage 4 — Analyzer
+Class: TaxiAnalyzer
+Method: summary(data) → prints:
+Total trips
+Average fare
+Max fare per passenger
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practice 2 — Customer Purchase Pipeline
+
+Goal: Build a pipeline to process customer purchase data.
+
+Instructions:
+
+Stage 1 — Customer Loader
+
+Class: CustomerLoader
+
+Method: load_data() → returns a list of customers with purchase histories
+
+Stage 2 — Filter High-Value Customers
+
+Class: CustomerFilter
+
+Method: filter_customers(customers, threshold) → returns customers with total purchase > threshold
+
+Stage 3 — Analytics
+
+Class: CustomerAnalytics
+
+Method: compute_stats(customers) → for each customer print:
+
+Total purchase
+
+Average purchase
+
+Number of purchases
+
+Stage 4 — Report
+
+Class: CustomerReport
+
+Method: generate_report(customers) → nicely prints a mini-dashboard
