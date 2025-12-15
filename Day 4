@@ -17,61 +17,87 @@ Total trips
 Average fare
 Max fare per passenger
 
+SOLUTION
 
+class TaxiDataLoader:
+	def load_data(self, file_path):
+		df = pd.read_csv(file_path)
+		return df
 
+class DataCleaner:
+	def clean_data(self, df):
+		df_filtered = df[(df['fare_amount'] > 0) &(df['passenger_count']>0)]
+		return df_filtered
 
+class FeatureEngineer:
+	def add_features(self, df):
+		df['fare_per_passenger'] = df['fare_amount'] / df_filtered['passenger_count']
+		return df
+class Analyzer:
+	def summary(self, df):
+		total_trips = len(df)
+		average_fare = df['fare'].mean()
+		max_fare_per_passenger = df['fare_per_passenger'].max()
+		return {"total_trips": total_trips, 
+"average_fare":average_fare, 
+"max_fare" : max_fare_per_passenger
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#--------------------------------------------------------------------------------------------
 
 Practice 2 — Customer Purchase Pipeline
 
 Goal: Build a pipeline to process customer purchase data.
-
-Instructions:
-
+Instructions
 Stage 1 — Customer Loader
-
 Class: CustomerLoader
-
 Method: load_data() → returns a list of customers with purchase histories
-
 Stage 2 — Filter High-Value Customers
-
 Class: CustomerFilter
-
 Method: filter_customers(customers, threshold) → returns customers with total purchase > threshold
-
 Stage 3 — Analytics
-
 Class: CustomerAnalytics
-
 Method: compute_stats(customers) → for each customer print:
-
 Total purchase
-
 Average purchase
-
 Number of purchases
-
 Stage 4 — Report
-
 Class: CustomerReport
-
 Method: generate_report(customers) → nicely prints a mini-dashboard
+
+SOLUTION
+
+class CustomerLoader:
+	def load_data(self, file_path):
+		df = pd.read_csv(file_path)
+		return df
+
+class Custom_Filter:
+	def filter_customers(self, df, threshold):
+		values = (df.groupby('customer_id')['purchase'].sum().reset_index())		high_value_ids = values[values['purchase'] > threshold]['customer_id'] 
+
+		return df[df['customer_id'].isin(high_value_ids)
+
+
+class CustomerAnalytics:
+	def compute_stats(customers):
+		stats = df.groupby('customer_id').agg(
+total_purchase = ('purchase', 'sum'),
+average_purchase = ('purchase', 'mean'),
+number_of_purchase = ('purchase', 'count')
+)
+		return stats
+
+class Report:
+	def CustomerReport(self, df):	
+		print("CUSTOMER PURCHASE REPORT")
+        	print("-" * 40)
+        	for customer_id, row in stats.iterrows():
+           	 print(f"Customer: {customer_id}")
+            	print(f"  Total Purchase   : {row.total_purchase}")
+            	print(f"  Average Purchase : {row.average_purchase:.2f}")
+            	print(f"  Purchases Count  : {row.number_of_purchases}")
+            	print("-" * 40)
+
+#---------------------------------------------------------------------------------------------
+		
